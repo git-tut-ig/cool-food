@@ -3,7 +3,7 @@
 **/artifacts/**
 
 # Remix plugin state folders
-deps/
+.deps/
 states/
 
 # Debug info
@@ -13,3 +13,7 @@ states/
 # Optional
 .env
 .env.local
+lib/
+out/
+broadcast/
+cache
