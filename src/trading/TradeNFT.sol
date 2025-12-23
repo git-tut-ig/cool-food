@@ -10,6 +10,9 @@ import {ReentrancyGuardTransient} from "lib/openzeppelin-contracts/contracts/uti
 import {SafeERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
+/// @title TradeNFT
+/// @notice Marketplace contract for trading `ProduceNFT` tokens using the project token.
+/// @dev Supports puts/asks, bidding, acceptance flows and safe ERC20 transfers.
 contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
     using SafeERC20 for IERC20;
     IResolver public resolver;
@@ -20,13 +23,6 @@ contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
     mapping(uint256 => Ask) private asks;
     mapping(uint256 => Bid) private bids;
     mapping(uint256 => uint256[]) private bidsByAsk;
-
-    error NotOwner();
-    error InvalidAsk();
-    error InvalidBid();
-    error NotBidder();
-    error NotSeller();
-    error NotActive();
 
     constructor(address resolverAddr) {
         resolver = IResolver(resolverAddr);
@@ -42,9 +38,9 @@ contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
 
     function createAsk(AskParams calldata ask) external override returns (uint256 askId) {
         // Caller must be seller
-        if (msg.sender != ask.seller) revert NotSeller();
+        if (msg.sender != ask.seller) revert ITradeNFT__NotSeller();
         // Token must exist and seller must be the owner
-        if (_produce().ownerOf(ask.tokenId) != ask.seller) revert NotOwner();
+        if (_produce().ownerOf(ask.tokenId) != ask.seller) revert ITradeNFT__NotOwner();
 
         askCounter++;
         askId = askCounter;
@@ -58,8 +54,8 @@ contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
 
     function cancelAsk(uint256 askId) external override {
         Ask storage a = asks[askId];
-        if (a.seller != msg.sender) revert NotSeller();
-        if (a.status != AskStatus.ACTIVE) revert NotActive();
+        if (a.seller != msg.sender) revert ITradeNFT__NotSeller();
+        if (a.status != AskStatus.ACTIVE) revert ITradeNFT__NotActive();
         a.status = AskStatus.CANCELLED;
         emit AskCancel(askId, msg.sender, a.tokenId);
     }
@@ -67,9 +63,9 @@ contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
     function createBid(BidParams calldata bid) external override nonReentrant returns (uint256 bidId) {
         // Checks
         Ask memory askObj = asks[bid.askId];
-        if (askObj.askId == 0 || askObj.status != AskStatus.ACTIVE) revert InvalidAsk();
-        if (bid.price == 0) revert InvalidBid();
-        if (bid.bidder != msg.sender) revert NotBidder();
+        if (askObj.askId == 0 || askObj.status != AskStatus.ACTIVE) revert ITradeNFT__InvalidAsk();
+        if (bid.price == 0) revert ITradeNFT__InvalidBid();
+        if (bid.bidder != msg.sender) revert ITradeNFT__NotBidder();
 
         // Effects (CEI: update state before external interactions)
         bidCounter++;
@@ -125,9 +121,9 @@ contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
 
     function cancelBid(uint256 bidId) external override nonReentrant {
         Bid storage b = bids[bidId];
-        if (b.bidId == 0) revert InvalidBid();
-        if (b.bidder != msg.sender) revert NotBidder();
-        if (b.status != BidStatus.ACTIVE) revert NotActive();
+        if (b.bidId == 0) revert ITradeNFT__InvalidBid();
+        if (b.bidder != msg.sender) revert ITradeNFT__NotBidder();
+        if (b.status != BidStatus.ACTIVE) revert ITradeNFT__NotActive();
         b.status = BidStatus.CANCELLED;
         // Refund using SafeERC20
         IERC20(address(_token())).safeTransfer(b.bidder, b.price);
@@ -136,11 +132,11 @@ contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
 
     function acceptBid(uint256 bidId) external override nonReentrant {
         Bid storage b = bids[bidId];
-        if (b.bidId == 0) revert InvalidBid();
-        if (b.status != BidStatus.ACTIVE) revert NotActive();
+        if (b.bidId == 0) revert ITradeNFT__InvalidBid();
+        if (b.status != BidStatus.ACTIVE) revert ITradeNFT__NotActive();
         Ask storage a = asks[b.askId];
-        if (a.seller != msg.sender) revert NotSeller();
-        if (a.status != AskStatus.ACTIVE) revert NotActive();
+        if (a.seller != msg.sender) revert ITradeNFT__NotSeller();
+        if (a.status != AskStatus.ACTIVE) revert ITradeNFT__NotActive();
 
         // Effects first (CEI): mark accepted to avoid races
         b.status = BidStatus.ACCEPTED;

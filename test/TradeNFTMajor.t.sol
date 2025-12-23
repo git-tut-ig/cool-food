@@ -94,9 +94,9 @@ contract TradeNFTMajor is IProduct, IAskBid, Test {
     function testMajorHappyPath() public {
         // 1. Top up buyer balances
         vm.startPrank(admin);
-        assertTrue(tokenCf.transferFrom(admin, buyer1, BUYER_BALANCE));
-        assertTrue(tokenCf.transferFrom(admin, buyer2, BUYER_BALANCE));
-        assertTrue(tokenCf.transferFrom(admin, buyer3, BUYER_BALANCE));
+        assertTrue(tokenCf.transfer(buyer1, BUYER_BALANCE));
+        assertTrue(tokenCf.transfer(buyer2, BUYER_BALANCE));
+        assertTrue(tokenCf.transfer(buyer3, BUYER_BALANCE));
         vm.stopPrank();
         // Assertions
         assertEq(tokenCf.balanceOf(buyer1), BUYER_BALANCE, "Buyer 1 balance should be equal to BUYER_BALANCE");
