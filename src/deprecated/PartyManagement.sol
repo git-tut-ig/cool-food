@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.29;
 
-import "./IPartyManagement.sol";
+import {IPartyManagement} from "./IPartyManagement.sol";
 
 /// @notice Basic implementation of `IPartyManagement` with owner-only administration.
 contract PartyManagement is IPartyManagement {
@@ -18,8 +18,12 @@ contract PartyManagement is IPartyManagement {
     mapping(address => uint256) private _indexOfAccount;
 
     modifier onlyOwner() {
-        if (msg.sender != owner) revert PartyManagement__NotOwner(msg.sender);
+        _onlyOwner();
         _;
+    }
+
+    function _onlyOwner() internal view {
+        if (msg.sender != owner) revert PartyManagement__NotOwner(msg.sender);
     }
 
     /// @notice Set deployer as owner

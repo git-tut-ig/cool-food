@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "forge-std/Test.sol";
-import "../script/DeployPartyManagement.s.sol";
-import "../src/deprecated/PartyManagement.sol";
+import {Test} from "forge-std/Test.sol";
+import {PartyManagement} from "../src/deprecated/PartyManagement.sol";
 
 contract PartyManagementBranchesTest is Test {
     PartyManagement party;

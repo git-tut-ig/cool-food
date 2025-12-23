@@ -13,7 +13,6 @@ states/
 # Optional
 .env
 .env.local
-lib/
 out/
 broadcast/
 cache
