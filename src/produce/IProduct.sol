@@ -3,8 +3,8 @@ pragma solidity ^0.8.29;
 
 interface IProduct {
     struct ProductInfo {
-        uint256 externalId;
-        address partyId;
+        string externalId;
+        address producer;
         Attribute[] attributes;
     }
 

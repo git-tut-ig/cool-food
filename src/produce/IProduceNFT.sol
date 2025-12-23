@@ -2,9 +2,10 @@
 pragma solidity ^0.8.29;
 
 import {IERC721} from "lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
+import {IERC721Metadata} from "lib/openzeppelin-contracts/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import {IProduct} from "./IProduct.sol";
 
-interface IProduceNFT is IERC721, IProduct {
+interface IProduceNFT is IERC721, IERC721Metadata, IProduct {
     event Minted(address indexed party, uint256 indexed tokenId, ProductInfo productInfo);
     event Produced(uint256 indexed tokenId);
     event Spoiled(address indexed originator, uint256 indexed tokenId, bytes reason);
@@ -26,6 +27,10 @@ interface IProduceNFT is IERC721, IProduct {
      */
     function mint(ProductInfo calldata productInfo, string calldata tokenURI) external returns (uint256 tokenId);
 
+    /**
+     * @notice Marks a product NFT as produced.
+     * @param tokenId The ID of the NFT to mark as produced.
+     */
     function produced(uint256 tokenId) external;
 
     /**
@@ -46,4 +51,6 @@ interface IProduceNFT is IERC721, IProduct {
      * @return status The current status of the NFT.
      */
     function getStatus(uint256 tokenId) external view returns (Status);
+
+    function getProductInfo(uint256 tokenId) external view returns (ProductInfo memory);
 }

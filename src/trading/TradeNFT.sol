@@ -3,6 +3,4 @@ pragma solidity ^0.8.29;
 
 import {ITradeNFT} from "./ITradeNFT.sol";
 
-contract TradeNFT is ITradeNFT   {
-
-}
+abstract contract TradeNFT is ITradeNFT {}

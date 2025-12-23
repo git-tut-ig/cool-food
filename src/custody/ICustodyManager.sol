@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.29;
 
-import {IArbitrageConsumer} from "../arbitrage/IArbitrageConsumer.sol";
-
 /**
  * @title ICustodyManager
  * @dev Interface for custody management.
  * @dev TBD: externalID usage for retrieval, update, etc.
  */
-interface ICustodyManager is IArbitrageConsumer {
+interface ICustodyManager {
     event CustodyAdded(uint256 indexed correlationId, uint256 indexed tokenId, address custodyOwner, uint40 startTime);
 
     struct Custody {
