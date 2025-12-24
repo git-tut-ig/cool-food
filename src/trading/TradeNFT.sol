@@ -10,9 +10,12 @@ import {ReentrancyGuardTransient} from "lib/openzeppelin-contracts/contracts/uti
 import {SafeERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-/// @title TradeNFT
-/// @notice Marketplace contract for trading `ProduceNFT` tokens using the project token.
-/// @dev Supports puts/asks, bidding, acceptance flows and safe ERC20 transfers.
+/**
+ * @title TradeNFT
+ * @notice Implementation of the `ITradeNFT` marketplace using the on-chain `IResolver` to locate
+ *         the project `TokenCF` and `ProduceNFT` contracts. Implements asks, bids, acceptance and
+ *         safe ERC20 transfers.
+ */
 contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
     using SafeERC20 for IERC20;
     IResolver public resolver;
@@ -36,6 +39,9 @@ contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
         return IProduceNFT(resolver.getAddress("ProduceNFT"));
     }
 
+    /**
+     * @inheritdoc ITradeNFT
+     */
     function createAsk(AskParams calldata ask) external override returns (uint256 askId) {
         // Caller must be seller
         if (msg.sender != ask.seller) revert ITradeNFT__NotSeller();
@@ -48,10 +54,16 @@ contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
         emit AskPut(askId, ask.seller, ask.tokenId);
     }
 
+    /**
+     * @inheritdoc ITradeNFT
+     */
     function getAsk(uint256 askId) external view override returns (Ask memory) {
         return asks[askId];
     }
 
+    /**
+     * @inheritdoc ITradeNFT
+     */
     function cancelAsk(uint256 askId) external override {
         Ask storage a = asks[askId];
         if (a.seller != msg.sender) revert ITradeNFT__NotSeller();
@@ -60,6 +72,9 @@ contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
         emit AskCancel(askId, msg.sender, a.tokenId);
     }
 
+    /**
+     * @inheritdoc ITradeNFT
+     */
     function createBid(BidParams calldata bid) external override nonReentrant returns (uint256 bidId) {
         // Checks
         Ask memory askObj = asks[bid.askId];
@@ -80,10 +95,16 @@ contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
         emit BidPut(bid.askId, bidId, bid.bidder, bid.price);
     }
 
+    /**
+     * @inheritdoc ITradeNFT
+     */
     function getBid(uint256 bidId) external view override returns (Bid memory) {
         return bids[bidId];
     }
 
+    /**
+     * @inheritdoc ITradeNFT
+     */
     function listBidsByAskId(uint256 askId) external view override returns (Bid[] memory) {
         uint256[] memory ids = bidsByAsk[askId];
         // return bids excluding cancelled bids (they should not appear in active listing)
@@ -102,6 +123,9 @@ contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
         return out;
     }
 
+    /**
+     * @inheritdoc ITradeNFT
+     */
     function listActiveBidsByAskId(uint256 askId) external view override returns (Bid[] memory) {
         uint256[] memory ids = bidsByAsk[askId];
         uint256 count = 0;
@@ -119,6 +143,9 @@ contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
         return out;
     }
 
+    /**
+     * @inheritdoc ITradeNFT
+     */
     function cancelBid(uint256 bidId) external override nonReentrant {
         Bid storage b = bids[bidId];
         if (b.bidId == 0) revert ITradeNFT__InvalidBid();
@@ -130,6 +157,9 @@ contract TradeNFT is ITradeNFT, ReentrancyGuardTransient {
         emit BidCancelled(b.askId, b.bidId, b.bidder);
     }
 
+    /**
+     * @inheritdoc ITradeNFT
+     */
     function acceptBid(uint256 bidId) external override nonReentrant {
         Bid storage b = bids[bidId];
         if (b.bidId == 0) revert ITradeNFT__InvalidBid();

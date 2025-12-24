@@ -6,10 +6,12 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ReentrancyGuardTransient} from "lib/openzeppelin-contracts/contracts/utils/ReentrancyGuardTransient.sol";
 
-/// @title TokenCF
-/// @notice A small, test-friendly ERC20 token used by the Cool Food project.
-/// @dev Implements `ITokenCF` and extends OpenZeppelin `ERC20`. The contract exposes
-///      a `mint` helper without access controls for use in tests and deployment scripts.
+/**
+ * @title TokenCF
+ * @notice A small, test-friendly ERC20 token used by the Cool Food project.
+ * @dev Implements `ITokenCF` and extends OpenZeppelin `ERC20`. The contract exposes
+ *      a `mint` helper without access controls for use in tests and deployment scripts.
+ */
 contract TokenCF is ITokenCF, ERC20, ReentrancyGuardTransient {
     /**
      * @notice Construct a new `TokenCF` instance.
@@ -28,9 +30,7 @@ contract TokenCF is ITokenCF, ERC20, ReentrancyGuardTransient {
      * @param amount Number of tokens to mint (in token base units).
      */
     function mint(address to, uint256 amount) external nonReentrant {
-        // Effects
         _mint(to, amount);
-        // No external interactions
     }
 
     /**

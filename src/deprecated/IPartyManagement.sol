@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.29;
 
-/// @title Party management interface
-/// @notice Tracks membership of accounts in parties and exposes read helpers
+/**
+ * @title IPartyManagement
+ * @notice Tracks membership of accounts in parties and exposes read helpers.
+ * @dev Implementations may enforce access control for `addAccount`/`removeAccount`.
+ */
 interface IPartyManagement {
     /**
      * @dev Emitted when `account` is added to `partyId`.
@@ -23,6 +26,7 @@ interface IPartyManagement {
      * @dev Implementations should enforce permissions and emit `AccountAdded` on success.
      * @param partyId The id of the party to add the account to.
      * @param account The account address to add.
+     * @custom:reverts PartyManagement__AlreadyMember if the account is already a member of the same party (implementation-defined).
      */
     function addAccount(uint256 partyId, address account) external;
 
@@ -31,6 +35,7 @@ interface IPartyManagement {
      * @dev Implementations should enforce permissions and emit `AccountRemoved` on success.
      * @param partyId The id of the party to remove the account from.
      * @param account The account address to remove.
+     * @custom:reverts PartyManagement__NotMember if the account is not a member of `partyId` (implementation-defined).
      */
     function removeAccount(uint256 partyId, address account) external;
 

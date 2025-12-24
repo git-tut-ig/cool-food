@@ -6,9 +6,11 @@ import {ERC721URIStorage} from "lib/openzeppelin-contracts/contracts/token/ERC72
 import {IProduceNFT} from "./IProduceNFT.sol";
 import {ReentrancyGuardTransient} from "lib/openzeppelin-contracts/contracts/utils/ReentrancyGuardTransient.sol";
 
-/// @title ProduceNFT
-/// @notice ERC721-based NFT representing produced goods. Stores minimal product metadata
-///         on-chain and emits lifecycle events for off-chain indexing.
+/**
+ * @title ProduceNFT
+ * @notice ERC721-based NFT representing produced goods. Stores minimal product metadata
+ *         on-chain and emits lifecycle events for off-chain indexing.
+ */
 contract ProduceNFT is ERC721URIStorage, IProduceNFT, ReentrancyGuardTransient {
     uint256 private _tokenIdCounter;
 
@@ -17,9 +19,11 @@ contract ProduceNFT is ERC721URIStorage, IProduceNFT, ReentrancyGuardTransient {
     mapping(uint256 => address) private productProducer;
     mapping(uint256 => Status) private statuses;
 
-    /// @notice Construct a new `ProduceNFT` collection.
-    /// @param name_ ERC721 name.
-    /// @param symbol_ ERC721 symbol.
+    /**
+     * @notice Construct a new `ProduceNFT` collection.
+     * @param name_ ERC721 name.
+     * @param symbol_ ERC721 symbol.
+     */
     constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {}
 
     /**
